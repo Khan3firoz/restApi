@@ -15,7 +15,13 @@ const mongoose = require('mongoose')
 const db = require("./config/dbConfig").mongoURI;
 const bodyParser = require("body-parser");
 
+
 const app = express();
+
+
+//passport spec
+const passport = require("passport")
+
 
 //apply body parser
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -29,30 +35,19 @@ mongoose
 
 
 
-
-//we nned a specific port for the communication
-const port = 5000;
-app.listen(port, () => {
-  console.log(`server is running on port no :${port}`);
-});
-app.get('/', (req, res) => {
-    res.send({msg:'Hello from the server'})
-})
+//password midleware
+app.use(passport.initialize())
+//Password Config
+require('./config/passport')(passport)
+// Use Routes
 app.use("/api/users", users);
 app.use("/api/profile", profile);
 app.use("/api/post", post);
 app.use("/api/comments", comments);
 
+//we need a specific port for the communication
+const port = 5000;
+app.listen(port, () => {
+  console.log(`server is running on port no :${port}`);
+});
 
-
-/*
-devconnecto==> database to store data
-user==>login and register
-user.js
-post
-post.js
-profile==> all exp and education details
-profile.js
-comments
-comment.js
-*/

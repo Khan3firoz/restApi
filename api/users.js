@@ -6,6 +6,8 @@ const validateRegisterInput = require("../validation/register");
 const validateLoginInput = require("../validation/login");
 const jwt = require("jsonwebtoken");
 const secretOrKey = require("../config/config").secretOrKey;
+// const passport = require("../config/passport");
+const passport = require("passport")
 
 //User registaton
 router.post("/register", (req, res) => {
@@ -65,9 +67,9 @@ router.post('/login', (req, res) => {
                         name: user.name,
                         email: user.email,
                     };
-                    jwt.sign(payload, secretOrKey, { expiresIn: 3600 }, (err, token) => {
+                    jwt.sign(payload,secretOrKey, { expiresIn: 3600 }, (err, token) => {
                     //share the token with client
-                        return res.json({
+                        res.json({
                             success: true,
                             token: "Bearer " + token,
                         });
@@ -85,8 +87,14 @@ router.post('/login', (req, res) => {
 //@desc:return the current user details
 //@access:private (it require token  then and only then it shoud be accessible)
 
-router.get("/current", (req, res) => {
-    res.json({ msg: " current is working" });
+router.get("/current",
+    passport.authenticate('jwt', { session: false }),
+    (req, res) => {
+        res.json({
+            id: req.user.id,
+            name: req.user.name,
+            email:req.user.email
+     });
   });
 
 module.exports = router;
