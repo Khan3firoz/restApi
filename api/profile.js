@@ -128,7 +128,14 @@ router.get("/user/:_id",
 
 });
 //delete
+// router.delete("/user/:user_id", passport.authenticate("jwt", { session: false }), (req, res) => {
+//     Profile.findOne({ user: req.user.id }).then((profile)=> {
+//         const removeIndex = profile.user.map(item => item.id).indexOf(req.params.user_id)
+//         profile.user.splice(removeIndex, 1)
+//         profile.save().then((profile) => res.json(profile));
+//     });
 
+// })
 //add exp
 
 router.post("/experience", passport.authenticate("jwt", { session: false }), (req, res) => {
