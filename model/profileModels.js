@@ -80,8 +80,8 @@ const ProfileSchema = new Schema({
             degree: {
                 type: String,
                 required: true
-            },
-            fieldofstudy: {
+            },fieldofstudy
+            : {
                 type: String,
                 required: true
             },
