@@ -2,7 +2,9 @@ const express = require("express");
 const router = express.Router();
 const validateProfileInput = require("../validation/profile")
 const passport = require("passport")
-const Profile = require("../model/profileModels")
+const Profile = require("../model/profileModels");
+const { findOne } = require("../model/profileModels");
+const profile = require("../validation/profile");
 
 //create profile
 router.post("/", passport.authenticate("jwt", { session: false }), (req, res) => {
@@ -39,7 +41,11 @@ router.post("/", passport.authenticate("jwt", { session: false }), (req, res) =>
 
     Profile.findOne({ user: req.user.id }).then((profile) => {
         if (profile) {
-
+            Profile.findOneAndUpdate(
+                { user: req.user.id },
+                { $set: profileFields },
+                {new:true}
+            ).then((profile)=> res.json(profile))
         }
         else {
             Profile.findOne({ handle: profileFields.handle }).then(
@@ -63,7 +69,47 @@ router.post("/", passport.authenticate("jwt", { session: false }), (req, res) =>
 );
 //update
 //get
+router.get("/", passport.authenticate("jwt", { session: false }), (req, res) => {
+    const errors = {};
+    Profile.findOne({ user: req.user.id })
+        .populate('user', ['name','email'])
+        .then(profile => {
+        if (!profile) {
+            errors.noprofile = 'There is no profile for the user'
+            return res.status(404).json(errors)
+        }
+        res.json(profile)
+    }).catch(err=> res.status(404).json(err))
+});
 //getall
+
+router.get("/all",
+    (req, res) => {
+    const errors = {};
+    Profile.find()
+        .populate('user', ['name','email'])
+        .then(profile => {
+        if (!profile) {
+            errors.noprofile = 'There is no profile for the user'
+            return res.status(404).json(errors)
+        }
+        res.json(profile)
+    }).catch(err=> res.status(404).json(err))
+
+});
+//based on handle retrieve the record
+router.get("/handle/:handle", passport.authenticate("jwt", { session: false }), (req, res) => {
+    const errors = {};
+    Profile.findOne({ handle: req.params.handle })
+        .populate('user', ['name','email'])
+        .then(profile => {
+        if (!profile) {
+            errors.noprofile = 'There is no profile for the user'
+            return res.status(404).json(errors)
+        }
+        res.json(profile)
+    }).catch(err=> res.status(404).json(err))
+});
 //delete
 //add exp
 //delete exp
